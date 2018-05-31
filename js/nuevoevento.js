@@ -184,7 +184,7 @@ $(document).ready(function()
 // función que se encargará de subir el archivo
     function subirArchivo(archivo) {
       // creo una referencia al lugar donde guardaremos el archivo
-      alert('Operación realizada con éxito !');
+      
       referenciaST = storage.ref('Imagenes').child(archivo.name);
       // Comienzo la tarea de upload
       uploadTask = referenciaST.put(archivo);
