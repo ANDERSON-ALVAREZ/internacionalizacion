@@ -16,49 +16,20 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 var referencia=database.ref("Universidades");
-var prevEvento,prevBotones,max_size,elements_per_page,limit,id,data,sta,dif;
+var prevEvento,prevBotones,max_size,elements_per_page,limit,id,data,sta,dif,prevFiltro;
 var convenios={};
 
 // Chequeamos la autenticación antes de acceder al resto de contenido de este fichero.
  firebase.auth().onAuthStateChanged(function(user) {
   if (user)
   {
-    console.log(user);
-    console.log('Usuario: '+user.uid+' está logueado con '+user.providerData[0].providerId);
-  
-
+    
     var logueado='<a href="login.html" id="botonLogout"><i class="fa fa-table fa-fw"></i> Cerrar Sesion</a>';
    
-    
-
    $(logueado).appendTo("#cerrarSesion");
    $("#botonLogout").click(desconectar);
-   //$("#botonLogout").click(desconectar);
-
-referencia.on('value',function(datos)
-{
-    
-    convenios=datos.val();
-
-//botones(3);
-   max_size=Object.keys(convenios).length;
-   
-   sta = 0;
-   elements_per_page = 2;
-   limit = elements_per_page;
-   data = Object.values(convenios);
-      
-       
-    id = Object.keys(convenios);
-    
-    paginar(sta,limit);
-     
-     
-    
-
-},function(objetoError){
-    console.log('Error de lectura:'+objetoError.code);
-});
+  
+   formulario();
 
 } else
 {
@@ -116,6 +87,30 @@ function paginar(sta,limit) {
     //dif=max_size-indice;
 }
 
+function formulario(){
+    
+    
+    $("#formulario div.row").remove();
+    
+    prevFiltro='<div style="min-height:100px"></div>';
+    prevFiltro+='<div class="panel panel-default">';
+    prevFiltro+='<div class="panel-heading">Convenios</div>';
+    prevFiltro+='<div class="panel-body">';
+    prevFiltro+='<form role="form">';
+    prevFiltro+='<div class="form-group">';
+    prevFiltro+='<label>Filtrar Convenios Por</label>';
+    prevFiltro+='<select class="form-control" id="opcion">';
+    prevFiltro+='<option>Todos</option><option>Universidad</option><option>Pais</option>';
+    prevFiltro+='</select></div>';
+    prevFiltro+='<div class="form-group">';
+    prevFiltro+='<input class="form-control" id="valor"></div>';
+    prevFiltro+='<div class="form-group">';
+    prevFiltro+='<button type="button" class="col-lg-offset-5 btn btn-primary" onclick="Filtrar()">Filtrar</button>';
+    prevFiltro+='</div></form></div></div>';
+    
+    $(prevFiltro).appendTo('#formulario');
+}
+
 function nextvalue(){
         
         var next = limit;
@@ -136,6 +131,18 @@ function prevalue(){
 	paginar(pre,limit); 
 	}
   };
+  
+  function botones() {
+    
+   
+    $("#botones div.row").remove();
+    
+   
+     prevBotones='<button type="button" class=" col-md-2 col-md-offset-5 btn btn-primary btn-circle" onclick="prevalue()"><</button>';
+     prevBotones+='<button type="button" class=" col-md-2 col-md-offset-1 btn btn-primary btn-circle" onclick="nextvalue()">></button>';
+     
+    $(prevBotones).appendTo('#botones');
+}
   
 function editarEvento(id)
 {
@@ -172,4 +179,80 @@ function borrarConvenio(id,pais)
         });
     }
 }
+
+function Filtrar(){
+    
+    
+    var opcion=$("#opcion").val();
+    var valor=$("#valor").val();
+    
+    //console.log(opcion,'-',valor);
+    
+    if(opcion == "Todos"){
+        
+       $("#formulario").empty();
+        
+       referencia.on('value',function(datos)
+        {
+    
+            convenios=datos.val();
+            max_size=Object.keys(convenios).length;
+            sta = 0;
+            elements_per_page = 2;
+            limit = elements_per_page;
+            data = Object.values(convenios);
+            id = Object.keys(convenios);
+    
+            paginar(sta,limit);
+            botones();
+     
+        },function(objetoError){
+            console.log('Error de lectura:'+objetoError.code);
+        });
+        
+    }else if(opcion != "Todos" && valor==""){
+        
+        alert("Debe Ingresar un valor valido");
+        
+    }else{
+        
+        $("#formulario").empty();
+        
+        switch(opcion){
+            
+        case "Pais":
+            opcion="pais";
+            break;
+            
+        case "Universidad":
+             opcion="nombre";
+             break;
+             
+        default:    
+        }
+        
+        referencia.orderByChild(opcion).equalTo(valor).on('value',function(datos)
+        {
+    
+            convenios=datos.val();
+            max_size=Object.keys(convenios).length;
+            sta = 0;
+            elements_per_page = 2;
+            limit = elements_per_page;
+            data = Object.values(convenios);
+            id = Object.keys(convenios);
+    
+            paginar(sta,limit);
+            botones();
+     
+        },function(objetoError){
+            console.log('Error de lectura:'+objetoError.code);
+        });
+        
+        
+        
+    }
+    
+    
+};
 
