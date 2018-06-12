@@ -111,7 +111,7 @@ function formulario(){
     
     prevFiltro='<div style="min-height:100px"></div>';
     prevFiltro+='<div class="panel panel-default">';
-    prevFiltro+='<div class="panel-heading">Eventos/div>';
+    prevFiltro+='<div class="panel-heading">Eventos</div>';
     prevFiltro+='<div class="panel-body">';
     prevFiltro+='<form role="form">';
     prevFiltro+='<div class="form-group">';
